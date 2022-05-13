@@ -1,0 +1,22 @@
+{
+    "name": "bohdan_parkhomenko/test_task",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Neuffer\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bohdan Parkhomenko[light-effect]",
+            "email": "light-effect@outlook.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
+}
