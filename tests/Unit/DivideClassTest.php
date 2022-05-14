@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Unit;
 
 use Neuffer\ClassFour;
-use Neuffer\ClassOne;
 use PHPUnit\Framework\TestCase;
 use Stubs\FileHelper;
 
