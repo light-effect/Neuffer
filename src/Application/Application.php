@@ -11,6 +11,8 @@ use Psr\Log\LoggerInterface;
 
 class Application
 {
+    public const RESULT_FILE = 'result.csv';
+
     private ParamsInterface $params;
 
     private FileServiceInterface $fileService;
@@ -37,7 +39,9 @@ class Application
 
         $data = $this->prepareData();
 
-        $this->fileService->writeToFile('result.csv', $data);
+        if ($data !== []) {
+            $this->fileService->writeToFile(self::RESULT_FILE, $data);
+        }
 
         $this->logger->log(0, 'Finished ' . $this->params->getActionParam()->toString() . ' operation');
     }
@@ -47,23 +51,17 @@ class Application
         $data = [];
 
         foreach ($this->fileService->fetchFileLines($this->params->getFileParam()) as $line) {
-            try {
-                $numbers = explode(';', $line);
-                $a = (int) $numbers[0];
-                $b = (int) $numbers[1];
+            [$a, $b] = explode(';', $line);
 
-                $result = $this->action->action($a, $b);
+            $result = $this->action->action((int) $a, (int) $b);
 
-                if ($this->isValid($result)) {
-                    $data[] = implode(';', [$a, $b, $result]);
+            if ($this->isValid($result)) {
+                $data[] = implode(';', [$a, $b, $result]);
 
-                    continue;
-                }
-
-                $this->logger->log(0, 'numbers ' . $a . ' and ' . $b . ' are wrong');
-            } catch (\Exception $exception) {
-
+                continue;
             }
+
+            $this->logger->log(0, 'numbers ' . $a . ' and ' . $b . ' are wrong');
         }
 
         return $data;
