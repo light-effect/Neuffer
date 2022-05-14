@@ -1,6 +1,8 @@
 <?php
 
-namespace Neuffer\Application;
+declare(strict_types=1);
+
+namespace Neuffer\Params\Factory;
 
 use Stubs\ConsoleHelper;
 

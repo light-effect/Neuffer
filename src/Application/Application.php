@@ -8,47 +8,32 @@ use Neuffer\ClassFour;
 use Neuffer\ClassOne;
 use Neuffer\Classthree;
 use Neuffer\ClassTwo;
+use Neuffer\Enum\ActionEnum;
+use Neuffer\Params\ParamsInterface;
 
 class Application
 {
+    private ParamsInterface $params;
+
+    public function __construct(ParamsInterface $params)
+    {
+        $this->params = $params;
+    }
+
     public function run(): void
     {
-        $shortopts = "a:f:";
-        $longopts  = array(
-            "action:",
-            "file:",
-        );
-
-        $options = getopt($shortopts, $longopts);
-
-        if(isset($options['a'])) {
-            $action = $options['a'];
-        } elseif(isset($options['action'])) {
-            $action = $options['action'];
-        } else {
-            $action = "xyz";
-        }
-
-        if(isset($options['f'])) {
-            $file = $options['f'];
-        } elseif(isset($options['file'])) {
-            $file = $options['file'];
-        } else {
-            $file = "notexists.csv";
-        }
-
         try {
-            if ($action == "plus") {
-                $classOne = new ClassOne($file);
-            } elseif ($action == "minus") {
-                $classTwo = new ClassTwo($file, "minus");
+            if ($this->params->getActionParam()->isAction(ActionEnum::SUM)) {
+                $classOne = new ClassOne($this->params->getFileParam());
+            } elseif ($this->params->getActionParam()->isAction(ActionEnum::MINUS)) {
+                $classTwo = new ClassTwo($this->params->getFileParam(), ActionEnum::MINUS);
                 $classTwo->start();
-            } elseif ($action == "multiply") {
+            } elseif ($this->params->getActionParam()->isAction(ActionEnum::MULTIPLY)) {
                 $classThree = new Classthree();
-                $classThree->setFile($file);
+                $classThree->setFile($this->params->getFileParam());
                 $classThree->execute();
-            } elseif ($action == "division") {
-                $classFouyr = new classFour($file);
+            } elseif ($this->params->getActionParam()->isAction(ActionEnum::DIVISION)) {
+                $classFouyr = new classFour($this->params->getFileParam());
             } else {
                 throw new \Exception("Wrong action is selected");
             }

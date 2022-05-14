@@ -5,23 +5,34 @@ declare(strict_types=1);
 namespace Integration;
 
 use Neuffer\Application\Application;
+use Neuffer\ConfigProvider;
+use Neuffer\Enum\ActionEnum;
+use Neuffer\Params\ParamsInterface;
+use Neuffer\ServiceManager\ServiceManager;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Stubs\ConsoleHelper;
 use Stubs\FileHelper;
 
 class ConsoleTest extends TestCase
 {
+    private ContainerInterface $container;
+
     public function setUp(): void
     {
         FileHelper::$log = [];
         FileHelper::$result = [];
         FileHelper::$data = [];
+
+        $this->container = new ServiceManager([
+            ConfigProvider::class,
+        ]);
     }
 
     public function testConsoleSum(): void
     {
         ConsoleHelper::$argv = [
-            'action' => 'plus',
+            'action' => ActionEnum::SUM,
             'file' => 'test',
         ];
 
@@ -29,7 +40,7 @@ class ConsoleTest extends TestCase
             [2, 2]
         ];
 
-       (new Application())->run();
+        (new Application($this->container->get(ParamsInterface::class)))->run();
 
         self::assertEquals(
             ["2;2;4\r\n"],
@@ -48,7 +59,7 @@ class ConsoleTest extends TestCase
     public function testConsoleMinus(): void
     {
         ConsoleHelper::$argv = [
-            'action' => 'minus',
+            'action' => ActionEnum::MINUS,
             'file' => 'test',
         ];
 
@@ -56,7 +67,7 @@ class ConsoleTest extends TestCase
             '4;2'
         ];
 
-       (new Application())->run();
+        (new Application($this->container->get(ParamsInterface::class)))->run();
 
         self::assertEquals(
             ["4;2;2\r\n"],
@@ -75,7 +86,7 @@ class ConsoleTest extends TestCase
     public function testConsoleMultiply(): void
     {
         ConsoleHelper::$argv = [
-            'action' => 'multiply',
+            'action' => ActionEnum::MULTIPLY,
             'file' => 'test',
         ];
 
@@ -83,7 +94,7 @@ class ConsoleTest extends TestCase
             ['3;2']
         ];
 
-       (new Application())->run();
+        (new Application($this->container->get(ParamsInterface::class)))->run();
 
         self::assertEquals(
             ["3;2;6\r\n"],
@@ -102,7 +113,7 @@ class ConsoleTest extends TestCase
     public function testConsoleDivide(): void
     {
         ConsoleHelper::$argv = [
-            'action' => 'division',
+            'action' => ActionEnum::DIVISION,
             'file' => 'test',
         ];
 
@@ -110,7 +121,7 @@ class ConsoleTest extends TestCase
             '9;3'
         ];
 
-       (new Application())->run();
+        (new Application($this->container->get(ParamsInterface::class)))->run();
 
         self::assertEquals(
             ["9;3;3\r\n"],
