@@ -14,7 +14,7 @@ use Neuffer\ServiceManager\ServiceManager;
 use Neuffer\ValueObject\ActionParam;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Stubs\ConsoleHelper;
+use Psr\Log\LoggerInterface;
 use Stubs\FileHelper;
 
 class ConsoleTest extends TestCase
@@ -58,7 +58,8 @@ class ConsoleTest extends TestCase
         $app = new Application(
             $params,
             $this->container->get(ActionInterface::class),
-            $fileService
+            $fileService,
+            $this->container->get(LoggerInterface::class)
         );
 
         $app->run();

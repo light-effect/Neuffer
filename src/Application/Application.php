@@ -7,6 +7,7 @@ namespace Neuffer\Application;
 use Neuffer\ActionStrategy\ActionInterface;
 use Neuffer\Params\ParamsInterface;
 use Neuffer\Service\FileServiceInterface;
+use Psr\Log\LoggerInterface;
 
 class Application
 {
@@ -16,14 +17,32 @@ class Application
 
     private ActionInterface $action;
 
-    public function __construct(ParamsInterface $params, ActionInterface $action, FileServiceInterface $fileService)
-    {
+    private LoggerInterface $logger;
+
+    public function __construct(
+        ParamsInterface $params,
+        ActionInterface $action,
+        FileServiceInterface $fileService,
+        LoggerInterface $logger
+    ) {
         $this->params      = $params;
         $this->action      = $action;
         $this->fileService = $fileService;
+        $this->logger      = $logger;
     }
 
     public function run(): void
+    {
+        $this->logger->log(0, 'Started ' . $this->params->getActionParam()->toString() . ' operation');
+
+        $data = $this->prepareData();
+
+        $this->fileService->writeToFile('result.csv', $data);
+
+        $this->logger->log(0, 'Finished ' . $this->params->getActionParam()->toString() . ' operation');
+    }
+
+    public function prepareData(): array
     {
         $data = [];
 
@@ -40,12 +59,14 @@ class Application
 
                     continue;
                 }
+
+                $this->logger->log(0, 'numbers ' . $a . ' and ' . $b . ' are wrong');
             } catch (\Exception $exception) {
 
             }
         }
 
-        $this->fileService->writeToFile('result.csv', $data);
+        return $data;
     }
 
     private function isValid(int $result): bool

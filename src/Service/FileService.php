@@ -31,7 +31,7 @@ class FileService implements FileServiceInterface
     {
         $fp = fopen($filename, 'a+');
 
-        fwrite($fp, implode("\r\n", $data));
+        fwrite($fp, implode(PHP_EOL, $data) . PHP_EOL);
 
         return fclose($fp);
     }
