@@ -38,4 +38,9 @@ class ActionParam
     {
         return $this->action === $action;
     }
+
+    public function toString(): string
+    {
+        return $this->action;
+    }
 }

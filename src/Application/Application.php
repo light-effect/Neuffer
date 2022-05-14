@@ -4,39 +4,52 @@ declare(strict_types=1);
 
 namespace Neuffer\Application;
 
-use Neuffer\ClassFour;
-use Neuffer\ClassOne;
-use Neuffer\Classthree;
-use Neuffer\ClassTwo;
-use Neuffer\Enum\ActionEnum;
+use Neuffer\ActionStrategy\ActionInterface;
 use Neuffer\Params\ParamsInterface;
+use Neuffer\Service\FileServiceInterface;
 
 class Application
 {
     private ParamsInterface $params;
 
-    public function __construct(ParamsInterface $params)
+    private FileServiceInterface $fileService;
+
+    private ActionInterface $action;
+
+    public function __construct(ParamsInterface $params, ActionInterface $action, FileServiceInterface $fileService)
     {
-        $this->params = $params;
+        $this->params      = $params;
+        $this->action      = $action;
+        $this->fileService = $fileService;
     }
 
     public function run(): void
     {
-        try {
-            if ($this->params->getActionParam()->isAction(ActionEnum::SUM)) {
-                $classOne = new ClassOne($this->params->getFileParam());
-            } elseif ($this->params->getActionParam()->isAction(ActionEnum::MINUS)) {
-                $classTwo = new ClassTwo($this->params->getFileParam(), ActionEnum::MINUS);
-                $classTwo->start();
-            } elseif ($this->params->getActionParam()->isAction(ActionEnum::MULTIPLY)) {
-                $classThree = new Classthree();
-                $classThree->setFile($this->params->getFileParam());
-                $classThree->execute();
-            } elseif ($this->params->getActionParam()->isAction(ActionEnum::DIVISION)) {
-                $classFouyr = new classFour($this->params->getFileParam());
-            } else {
-                throw new \Exception("Wrong action is selected");
+        $data = [];
+
+        foreach ($this->fileService->fetchFileLines($this->params->getFileParam()) as $line) {
+            try {
+                $numbers = explode(';', $line);
+                $a = (int) $numbers[0];
+                $b = (int) $numbers[1];
+
+                $result = $this->action->action($a, $b);
+
+                if ($this->isValid($result)) {
+                    $data[] = implode(';', [$a, $b, $result]);
+
+                    continue;
+                }
+            } catch (\Exception $exception) {
+
             }
-        } catch (\Exception $exception) {}
+        }
+
+        $this->fileService->writeToFile('result.csv', $data);
+    }
+
+    private function isValid(int $result): bool
+    {
+        return $result > 0;
     }
 }

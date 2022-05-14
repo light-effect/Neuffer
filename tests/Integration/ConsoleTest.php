@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Integration;
 
+use Neuffer\ActionStrategy\ActionInterface;
 use Neuffer\Application\Application;
 use Neuffer\ConfigProvider;
 use Neuffer\Enum\ActionEnum;
 use Neuffer\Params\ParamsInterface;
+use Neuffer\Service\FileServiceInterface;
 use Neuffer\ServiceManager\ServiceManager;
+use Neuffer\ValueObject\ActionParam;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Stubs\ConsoleHelper;
@@ -29,111 +32,46 @@ class ConsoleTest extends TestCase
         ]);
     }
 
-    public function testConsoleSum(): void
+    /**
+     * @dataProvider consoleDataSets
+     */
+    public function testConsoleSum(string $action, array $fileData, array $expectedResult): void
     {
-        ConsoleHelper::$argv = [
-            'action' => ActionEnum::SUM,
-            'file' => 'test',
-        ];
-
-        FileHelper::$data = [
-            [2, 2]
-        ];
-
-        (new Application($this->container->get(ParamsInterface::class)))->run();
-
-        self::assertEquals(
-            ["2;2;4\r\n"],
-            FileHelper::$result
+        $params = $this->createMock(ParamsInterface::class);
+        $params->method('getActionParam')->willReturn(
+            ActionParam::createFromString($action)
         );
 
-        self::assertEquals(
-            [
-                "Started plus operation \r\n",
-                "Finished plus operation \r\n",
-            ],
-            FileHelper::$log
+        $this->container->replaceMap(ParamsInterface::class, static fn() => $params);
+
+        $fileService = $this->createMock(FileServiceInterface::class);
+        $fileService
+            ->expects(self::once())
+            ->method('fetchFileLines')
+            ->willReturn($fileData);
+        $fileService
+            ->expects(self::once())
+            ->method('writeToFile')
+            ->with('result.csv', $expectedResult)
+            ->willReturn(true);
+
+        $app = new Application(
+            $params,
+            $this->container->get(ActionInterface::class),
+            $fileService
         );
+
+        $app->run();
     }
 
-    public function testConsoleMinus(): void
+    public function consoleDataSets(): array
     {
-        ConsoleHelper::$argv = [
-            'action' => ActionEnum::MINUS,
-            'file' => 'test',
-        ];
-
-        FileHelper::$data = [
-            '4;2'
-        ];
-
-        (new Application($this->container->get(ParamsInterface::class)))->run();
-
-        self::assertEquals(
-            ["4;2;2\r\n"],
-            FileHelper::$result
-        );
-
-        self::assertEquals(
-            [
-                "Started minus operation \r\n",
-                "Finished minus operation \r\n",
+        return [
+            ActionEnum::SUM => [
+                'action'         => ActionEnum::SUM,
+                'fileData'       => ['2;2'],
+                'expectedResult' => ['2;2;4'],
             ],
-            FileHelper::$log
-        );
-    }
-
-    public function testConsoleMultiply(): void
-    {
-        ConsoleHelper::$argv = [
-            'action' => ActionEnum::MULTIPLY,
-            'file' => 'test',
         ];
-
-        FileHelper::$data = [
-            ['3;2']
-        ];
-
-        (new Application($this->container->get(ParamsInterface::class)))->run();
-
-        self::assertEquals(
-            ["3;2;6\r\n"],
-            FileHelper::$result
-        );
-
-        self::assertEquals(
-            [
-                "Started multiply operation\r\n",
-                "Finished multiply operation\r\n",
-            ],
-            FileHelper::$log
-        );
-    }
-
-    public function testConsoleDivide(): void
-    {
-        ConsoleHelper::$argv = [
-            'action' => ActionEnum::DIVISION,
-            'file' => 'test',
-        ];
-
-        FileHelper::$data = [
-            '9;3'
-        ];
-
-        (new Application($this->container->get(ParamsInterface::class)))->run();
-
-        self::assertEquals(
-            ["9;3;3\r\n"],
-            FileHelper::$result
-        );
-
-        self::assertEquals(
-            [
-                "Started division operation \r\n",
-                "Finished division operation \r\n",
-            ],
-            FileHelper::$log
-        );
     }
 }
