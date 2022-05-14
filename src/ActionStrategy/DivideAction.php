@@ -10,10 +10,12 @@ class DivideAction implements ActionInterface
 {
     public function action(int $a, int $b): int
     {
-        try {
-            return $a / $b;
-        } catch (Exception $exception) {
+        if ($b === 0) {
             return 0;
         }
+
+        $result = $a / $b;
+
+        return (int) round($result);
     }
 }

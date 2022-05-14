@@ -56,12 +56,12 @@ class Application
             $result = $this->action->action((int) $a, (int) $b);
 
             if ($this->isValid($result)) {
-                $data[] = implode(';', [$a, $b, $result]);
+                $data[] = implode(';', [trim($a), trim($b), $result]);
 
                 continue;
             }
 
-            $this->logger->log(0, 'numbers ' . $a . ' and ' . $b . ' are wrong');
+            $this->logger->log(0, 'numbers ' . trim($a) . ' and ' . trim($b) . ' are wrong');
         }
 
         return $data;
