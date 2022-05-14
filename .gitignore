@@ -3,3 +3,5 @@
 log.txt
 result.csv
 vendor/
+
+.phpunit.result.cache
