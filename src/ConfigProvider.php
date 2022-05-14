@@ -18,10 +18,10 @@ class ConfigProvider implements ConfigProviderInterface
     public function getFactories(): array
     {
         return [
-            ParamsInterface::class => ParamsFactory::class,
-            ActionInterface::class => ActionStrategyFactory::class,
+            ParamsInterface::class      => ParamsFactory::class,
+            ActionInterface::class      => ActionStrategyFactory::class,
             FileServiceInterface::class => FileServiceFactory::class,
-            LoggerInterface::class => LoggerFactory::class,
+            LoggerInterface::class      => LoggerFactory::class,
         ];
     }
 }

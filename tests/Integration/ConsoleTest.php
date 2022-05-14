@@ -15,7 +15,6 @@ use Neuffer\ValueObject\ActionParam;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Stubs\FileHelper;
 
 class ConsoleTest extends TestCase
 {
@@ -23,10 +22,6 @@ class ConsoleTest extends TestCase
 
     public function setUp(): void
     {
-        FileHelper::$log = [];
-        FileHelper::$result = [];
-        FileHelper::$data = [];
-
         $this->container = new ServiceManager([
             ConfigProvider::class,
         ]);

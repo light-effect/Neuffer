@@ -34,11 +34,6 @@ class ActionParam
         throw new UnsupportedActionException($action);
     }
 
-    public function isAction(string $action): bool
-    {
-        return $this->action === $action;
-    }
-
     public function toString(): string
     {
         return $this->action;
