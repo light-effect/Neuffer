@@ -72,6 +72,21 @@ class ConsoleTest extends TestCase
                 'fileData'       => ['2;2'],
                 'expectedResult' => ['2;2;4'],
             ],
+            ActionEnum::MINUS => [
+                'action'         => ActionEnum::MINUS,
+                'fileData'       => ['4;2'],
+                'expectedResult' => ['4;2;2'],
+            ],
+            ActionEnum::MULTIPLY => [
+                'action'         => ActionEnum::MULTIPLY,
+                'fileData'       => ['3;2'],
+                'expectedResult' => ['3;2;6'],
+            ],
+            ActionEnum::DIVISION => [
+                'action'         => ActionEnum::DIVISION,
+                'fileData'       => ['9;3'],
+                'expectedResult' => ['9;3;3'],
+            ],
         ];
     }
 }
